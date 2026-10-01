@@ -3,6 +3,13 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+# Codespace 啟動時會自動跑一次；手動同時再跑時，等前一次跑完再接著做，避免兩邊搶著建立容器
+exec 9>/tmp/erp-start.lock
+if ! flock -n 9; then
+  echo "另一個啟動程序正在執行（Codespace 開啟時會自動啟動），等它完成..."
+  flock 9
+fi
+
 test -f .env.docker || cp .env.docker.example .env.docker
 
 for _ in $(seq 60); do

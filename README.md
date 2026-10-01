@@ -91,7 +91,8 @@ v0.1 欄位依公開 repo 的初始乾淨快照整理；先前內部開發歷史
 4. 用 `admin / admin` 登入。舊版介面在網址後面加 `/legacy/`。
 
 > [!NOTE]
-> Codespace 啟動時也會自動執行一次 `start.sh`；如果已經在跑，再執行一次也沒關係，不會重複建立。
+> Codespace 啟動時也會自動執行一次 `start.sh`。手動再執行時，如果自動的那次還沒跑完，會先等它完成再繼續，不會衝突。
+> 用 `docker compose ps` 可以查看目前狀態；`api`、`legacy` 顯示 `(healthy)` 就代表已經在跑了。
 > 出現 `docker: command not found` 代表 Codespace 進入了復原模式：按 `Ctrl + Shift + P` → **Codespaces: Rebuild Container** 重建即可。
 
 > [!TIP]
