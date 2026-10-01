@@ -8,106 +8,106 @@
 ![Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B?logo=streamlit&logoColor=white)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> **v1.0 — A governed supply-chain AI decision loop**
-> AI makes judgments and proposals; humans retain execution authority. Protected AI/Gateway procurement writes can be approved, replayed, and traced.
+> **v1.0 — 可治理的供應鏈 AI 決策閉環**
+> AI 負責判斷與提案，人類保留執行權；受保護的 AI／Gateway 採購寫入可被審批、重放與追溯。
 
-This project implements an AI Agent ERP with governance controls. It integrates external supply-chain risk, internal procurement data, AI-assisted proposals, human approval, and ERP execution.
+本專案實作一套具治理控制的 AI Agent 進銷存系統，整合外部供應鏈風險、企業採購資料、AI 決策提案、人工核准與 ERP 執行。
 
 > [!IMPORTANT]
-> v1.0 is a competition and research proof of concept. Its deployment boundary is one SQLite database per organization. It does not provide shared-database row-level multi-tenancy, external IAM/SSO, or distributed transactions, and must not be treated as a production identity or authorization service on the public internet.
+> 本版本是競賽與研究型 PoC。它採「一個 SQLite 資料庫對應一個組織」的部署邊界，尚未提供共享資料庫的多租戶隔離、外部 IAM/SSO 或跨系統分散式交易，因此不得直接當成公開網路服務的正式身分與授權系統。
 
-## Functional tiers
+## 功能層級
 
-| Tier | Demo account | Provided capabilities | Restrictions |
+| 層級 | Demo 帳號 | 提供功能 | 限制 |
 |---|---|---|---|
-| **L1 Risk Observer** | `viewer / viewer` | Risk KPIs, heatmap, alerts, read-only CSV mapping, notification preview | Cannot create proposals or modify ERP data |
-| **L2 Intelligence & Decision** | `planner / planner` | Impact analysis, What-if, alternative-supplier comparison, durable Proposal submission | Cannot approve or directly execute ERP writes |
-| **L3 Approval & Execution** | `approver / approver` | Review evidence, approve/reject, Gateway execution, audit timeline | Cannot approve its own proposal |
+| **L1 風險觀測** | `viewer / viewer` | 風險 KPI、熱圖、最新告警、唯讀 CSV 對映與通知預覽 | 不建立提案、不修改 ERP |
+| **L2 情報與決策** | `planner / planner` | 影響分析、What-if、替代供應商比較、建立不可變 Proposal 並送審 | 不核准、不直接執行 ERP 寫入 |
+| **L3 核准與執行** | `approver / approver` | 檢視核准證據、核准／拒絕、Gateway 執行、稽核時間線 | 不能核准自己的提案 |
 
-### Procurement decision flow
+### 採購決策流程
 
-![Procurement decision flow](docs/images/governed_procurement_flow_en.drawio.png)
+![採購決策流程](docs/images/governed_procurement_flow_zh.drawio.png)
 
-[Editable draw.io source](docs/diagrams/governed_procurement_flow_en.drawio)
+[draw.io 可編輯原檔](docs/diagrams/governed_procurement_flow_zh.drawio)
 
 ## v0.1 → v1.0
 
-v1.0 builds on the v0.1 governance harness by adding the L1→L2→L3 supply-chain decision workflow and tier-specific interfaces.
+v1.0 在 v0.1 治理 harness 基礎上，加入 L1→L2→L3 供應鏈決策流程與分層操作介面。
 
-| Area | v0.1 — Governance Harness Complete | v1.0 — Governed Decision Loop |
+| 面向 | v0.1 — Governance Harness Complete | v1.0 — Governed Decision Loop |
 |---|---|---|
-| Primary outcome | Closed governance bypasses across Web, LINE, and rollback paths | Connected the governance foundation into a complete L1→L2→L3 product flow |
-| AI state disclosure | Code-enforced pending/denied disclosure | Separate Proposal, Approval, and Execution objects keep UI and database state aligned |
-| Supply-chain workflow | Intelligence, heatmap, affected records, and recommendations existed as separate capabilities | An affected procurement line can become a governed alternative-purchase Proposal |
-| Human approval | Generic write approval with auditable state | L3 reviews source PO, supplier change, quantity, unit price, reason, and digest |
-| Execution safety | Gateway, hash-chain logs, and transaction baseline | Exact line/price identity, live revocation checks, one effect per source line, idempotent receipts |
-| Product tiers | Governance roles and capabilities | Three accounts with distinct views and least-privilege behavior |
-| Automated tests | **56 passing tests** on the public snapshot | **327 passing tests** in v1.0 release verification |
-| Documentation | Chinese README and architecture diagrams | Bilingual README, version comparison, documented scope and limitations, and English release notes |
+| 核心成果 | 關閉 Web、LINE、rollback 等治理旁路 | 將治理底座接成 L1→L2→L3 完整產品流程 |
+| AI 狀態揭露 | 由程式強制揭露 pending／denied，不依賴 prompt | Proposal、Approval、Execution 分離，畫面與資料庫狀態一致 |
+| 供應鏈流程 | 情資、熱圖、受影響單據與建議各自存在 | 受影響採購明細可直接形成替代採購 Proposal |
+| 人工核准 | 通用寫入審批與可稽核狀態 | L3 顯示來源單據、供應商變更、數量、單價、理由與 digest |
+| 執行安全 | Gateway、hash-chain log、transaction baseline | exact line/price identity、即時撤權檢查、同來源明細唯一 effect、冪等 receipt |
+| 產品分層 | 角色與治理能力為主要重點 | 三個獨立帳號、三種可見功能與最小權限 |
+| 自動化測試 | **56 passing tests**（公開快照驗證） | **327 passing tests**（v1.0 release verification） |
+| 文件 | 中文 README 與架構圖 | 雙語 README、版本比較、適用範圍與限制、v1.0 Release notes |
 
-The v0.1 column is based on the initial cleaned snapshot in this public repository. Earlier internal development history is intentionally not linked from public documentation.
+v0.1 欄位依公開 repo 的初始乾淨快照整理；先前內部開發歷史不列入公開文件連結。
 
-## Governance and security design
+## 治理與安全設計
 
-- **Server-side capability checks:** role, organization membership, and entitlements are reloaded from the database; missing or revoked access fails closed.
-- **Separation of duties:** L2 proposes and L3 decides. The original proposer cannot self-approve, even after a role change.
-- **Immutable approval evidence:** a canonical payload digest covers effectful fields and binds the source PO line, supplier price row, and operation ID.
-- **Atomic execution:** protected purchase approval performs CAS state transition, ERP write, business-effect claim, execution receipt, and terminal status in one SQLite transaction.
-- **Idempotent replay:** the same operation returns its existing receipt instead of creating a second purchase order.
-- **End-to-end audit:** Proposal, approval, and execution share one operation ID; public UI surfaces expose only redacted summaries.
-- **34 governed tools:** 27 `read_only`, 1 `suggestion`, 6 `write`, and 0 `dangerous`; eight specialist Agents receive task-specific allowlists.
+- **伺服器端能力檢查**：角色、組織 membership 與 entitlement 每次從資料庫重新載入；缺值或撤權後一律 fail closed。
+- **職責分離**：L2 只能提案，L3 才能決策；同一帳號即使換角色也不能核准自己的提案。
+- **不可變核准證據**：canonical payload digest 覆蓋真正決定效果的欄位，並綁定來源採購明細、替代供應商價格與 operation ID。
+- **原子執行**：受保護採購單在同一 SQLite transaction 內完成 CAS 狀態轉移、ERP 寫入、business-effect claim、execution receipt 與終態。
+- **冪等重放**：相同 operation 重送時回傳既有 receipt，不會建立第二張採購單。
+- **端到端稽核**：L2 Proposal、L3 決策與 Gateway 執行以同一 operation ID 串接；公開畫面只顯示脫敏摘要。
+- **34 個受治理工具**：27 `read_only`、1 `suggestion`、6 `write`、0 `dangerous`；8 個專責 Agent 僅持有職責內白名單。
 
-## Architecture
+## 系統架構
 
-![System architecture](docs/images/system_architecture_en.drawio.png)
+![系統架構](docs/images/system_architecture_zh.drawio.png)
 
-[Editable draw.io source](docs/diagrams/system_architecture_en.drawio)
+[draw.io 可編輯原檔](docs/diagrams/system_architecture_zh.drawio)
 
-The governance claims above are scoped to the protected AI/Gateway procurement workflow. Existing manual Web ERP forms have role-based access controls, but not every manual write produces a Proposal, Approval, and execution receipt.
+治理宣稱的邊界是上圖中的受保護 AI／Gateway 採購流程。現有手動 Web ERP 表單另有角色權限控制，但並非每個手動寫入都會產生 Proposal、Approval 與 execution receipt。
 
-## Docker deployment (recommended)
+## Docker 部署（推薦）
 
-Run the full system with Docker: React frontend, FastAPI backend, and legacy Streamlit UI. No local Python or Node.js needed.
+用 Docker 一次啟動完整系統：React 前端、FastAPI 後端、舊版 Streamlit，不需要自己裝 Python 或 Node.js。
 
 ```text
-Browser ──► web (nginx, port 80)
-              ├─ /         → React frontend
-              ├─ /api/     → api (FastAPI :8000)
-              └─ /legacy/  → legacy (Streamlit :8501)
-                               └─ database in Docker volume "erp-data"
+瀏覽器 ──► web（nginx，對外 80 埠）
+             ├─ /         → React 前端
+             ├─ /api/     → api（FastAPI :8000）
+             └─ /legacy/  → legacy（Streamlit :8501）
+                              └─ 資料庫存在 Docker volume「erp-data」
 ```
 
-### Fastest: run it on GitHub (Codespaces, nothing to install)
+### 最快：直接在 GitHub 上執行（Codespaces，不用安裝任何東西）
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/ewiwi22255/docker-project-test?quickstart=1)
 
-1. Click the button above (or on the repo page: green **Code** → **Codespaces** → **Create codespace on main**).
-2. Wait while the cloud machine is created and `docker compose` runs automatically (about 3–5 minutes the first time; progress shows in the terminal).
-3. The app opens in your browser when ready. If it doesn't, open the **PORTS** tab and click the globe icon next to `8080`.
-4. Sign in as `admin / admin`. The legacy UI is at `/legacy/`.
+1. 點上方按鈕（或在 repo 頁面按綠色 **Code** → **Codespaces** → **Create codespace on main**）。
+2. 等待雲端機器建立，並自動執行 `docker compose`（第一次約 3–5 分鐘，終端機會顯示進度）。
+3. 完成後瀏覽器會自動開啟網頁；沒有的話，到下方 **PORTS（連接埠）** 分頁，點 `8080` 旁的地球圖示。
+4. 用 `admin / admin` 登入。舊版介面在網址後面加 `/legacy/`。
 
 > [!TIP]
-> Personal accounts get a free monthly Codespaces quota. Stop or delete the codespace at https://github.com/codespaces when you're done.
+> Codespaces 個人帳號每月有免費額度。用完記得到 https://github.com/codespaces 停止或刪除，避免耗用時數。
 
-The steps below run it on your own computer or server.
+以下是在自己電腦或伺服器上執行的方法。
 
-### 0. Install Docker
+### 0. 安裝 Docker
 
-You need **Docker Engine** and **Docker Compose v2** (the command is `docker compose`, with a space).
+需要 **Docker Engine** 與 **Docker Compose v2**（指令是 `docker compose`，中間是空格）。
 
-- Windows / macOS: install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- Ubuntu: follow the [official guide](https://docs.docker.com/engine/install/ubuntu/) to install `docker-ce` and `docker-compose-plugin`
+- Windows / macOS：安裝 [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- Ubuntu：照 [官方教學](https://docs.docker.com/engine/install/ubuntu/) 安裝 `docker-ce` 與 `docker-compose-plugin`
 
 > [!NOTE]
-> Ubuntu's bundled `docker.io` with the old `docker-compose` (hyphenated) does not support this project's compose syntax. Use the official packages.
+> Ubuntu 內建的 `docker.io` + 舊版 `docker-compose`（中間是減號）不支援本專案的 compose 語法，請用官方套件。
 
-Verify:
+確認安裝成功：
 
 ```bash
 docker compose version
 ```
 
-### 1. Get the code and create the config
+### 1. 下載專案並建立設定檔
 
 ```bash
 git clone https://github.com/ewiwi22255/docker-project-test.git
@@ -115,80 +115,80 @@ cd docker-project-test
 cp .env.docker.example .env.docker
 ```
 
-The defaults in `.env.docker` work as-is (demo mode, port 80). Fill in `LLM_MODEL` and a key to enable AI features. This file holds secrets and is listed in `.gitignore`.
+`.env.docker` 預設就能直接啟動（示範模式、80 埠）。要用 AI 功能再填入 `LLM_MODEL` 與金鑰。這個檔含金鑰，已列在 `.gitignore`，不會上傳。
 
-### 2. Start (choose one)
+### 2. 啟動（二擇一）
 
-**Option A: build from source** (first build takes a few minutes)
+**方法 A：從原始碼建置**（第一次約需數分鐘）
 
 ```bash
 docker compose --env-file .env.docker up -d --build
 ```
 
-**Option B: pull prebuilt images from GitHub** (faster, no build)
+**方法 B：下載 GitHub 上預先建好的映像**（較快，不用建置）
 
-Uncomment these two lines in `.env.docker`:
+把 `.env.docker` 裡這兩行的 `#` 拿掉：
 
 ```dotenv
 ERP_BACKEND_IMAGE=ghcr.io/ewiwi22255/docker-project-test-backend:latest
 ERP_WEB_IMAGE=ghcr.io/ewiwi22255/docker-project-test-web:latest
 ```
 
-Then run:
+然後執行：
 
 ```bash
 docker compose --env-file .env.docker pull
 docker compose --env-file .env.docker up -d
 ```
 
-> On Linux, if you get `permission denied`, prefix commands with `sudo`, or run `sudo usermod -aG docker $USER` and log in again.
+> Linux 上若出現 `permission denied`，在指令前面加 `sudo`，或執行 `sudo usermod -aG docker $USER` 後重新登入。
 
-### 3. Check status
+### 3. 確認狀態
 
 ```bash
 docker compose ps
 ```
 
-It is ready when `api` and `legacy` show `(healthy)`. `web` has no health check; `Up` is enough.
+等 `api` 與 `legacy` 顯示 `(healthy)` 就完成了（`web` 沒有健康檢查，顯示 `Up` 即可）。
 
-### 4. Open the app
+### 4. 開啟網頁
 
-| URL | Content |
+| 網址 | 內容 |
 |---|---|
-| `http://localhost` | New React UI |
-| `http://localhost/legacy/` | Legacy Streamlit UI |
+| `http://localhost` | 新版 React 介面 |
+| `http://localhost/legacy/` | 舊版 Streamlit 介面 |
 
-From another machine, replace `localhost` with the host's IP (on Linux: `hostname -I`). In demo mode, sign in as `admin / admin` (administrator) or the `viewer`, `planner`, `approver` accounts listed above (password = username).
+從其他電腦連線時，把 `localhost` 換成主機 IP（Linux 用 `hostname -I` 查詢）。示範模式下可用 `admin / admin`（系統管理員），或上方表格中的 `viewer`、`planner`、`approver`（帳號密碼相同）登入。
 
-### Common commands
+### 常用指令
 
-| Action | Command |
+| 動作 | 指令 |
 |---|---|
-| Follow logs | `docker compose logs -f api` |
-| Stop | `docker compose down` |
-| Start again | `docker compose --env-file .env.docker up -d` |
-| Update (Option A) | `git pull && docker compose --env-file .env.docker up -d --build` |
-| Update (Option B) | `docker compose --env-file .env.docker pull && docker compose --env-file .env.docker up -d` |
-| **Erase all data** | `docker compose down -v` (deletes the database volume; cannot be undone) |
+| 看即時紀錄 | `docker compose logs -f api` |
+| 停止 | `docker compose down` |
+| 再次啟動 | `docker compose --env-file .env.docker up -d` |
+| 更新到最新版（方法 A） | `git pull && docker compose --env-file .env.docker up -d --build` |
+| 更新到最新版（方法 B） | `docker compose --env-file .env.docker pull && docker compose --env-file .env.docker up -d` |
+| **清除所有資料** | `docker compose down -v`（會刪除資料庫 volume，無法復原） |
 
-### Troubleshooting
+### 常見問題
 
-- **Port 80 in use**: set `ERP_HTTP_PORT=8080` in `.env.docker` and open `http://localhost:8080`.
-- **Errors about `env_file`**: your Compose is too old; upgrade to v2.24 or later.
-- **Option B fails with `denied` / `unauthorized`**: the GitHub images are not public yet; use Option A.
+- **80 埠被占用**：把 `.env.docker` 的 `ERP_HTTP_PORT` 改成 `8080`，網址改為 `http://localhost:8080`。
+- **`env_file` 相關錯誤**：Compose 版本太舊，請升級到 v2.24 以上。
+- **方法 B 出現 `denied` / `unauthorized`**：GitHub 上的映像尚未設為公開，請改用方法 A。
 
-### GitHub Actions automation
+### GitHub Actions 自動化
 
-[`.github/workflows/docker-publish.yml`](.github/workflows/docker-publish.yml) runs on GitHub:
+[`.github/workflows/docker-publish.yml`](.github/workflows/docker-publish.yml) 會在 GitHub 上：
 
-1. **Every push or PR**: starts the full stack with `docker compose` and checks that the web page, `/api/health`, and `/legacy/` respond.
-2. **Pushes to `main` or `v*` tags that pass**: publishes the images to GitHub Container Registry (used by Option B).
+1. **每次推送或 PR**：用 `docker compose` 啟動整套系統，檢查網頁、`/api/health`、`/legacy/` 都正常回應。
+2. **推送到 `main` 或 `v*` 標籤且測試通過**：把映像發布到 GitHub Container Registry（方法 B 用的就是這些映像）。
 
-See results in the repo's **Actions** tab.
+執行結果在 repo 的 **Actions** 分頁查看。
 
-## Quick start (without Docker)
+## 快速開始（不使用 Docker）
 
-### 1. Install
+### 1. 安裝
 
 ```bash
 git clone https://github.com/ewiwi22255/docker-project-test.git
@@ -203,13 +203,13 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-### 2. Configure a local demo
+### 2. 建立本機 Demo 設定
 
 ```bash
 cp .env.example .env
 ```
 
-Set at least:
+在 `.env` 至少設定：
 
 ```dotenv
 ERP_DEMO_MODE=true
@@ -217,79 +217,79 @@ LLM_MODEL=gemini/gemini-2.5-flash
 GEMINI_API_KEY=replace_with_your_key
 ```
 
-### 3. Run
+### 3. 啟動
 
 ```bash
 streamlit run app.py
 ```
 
-Known credentials such as `viewer`, `planner`, and `approver` are created and displayed only in Demo Mode. **Use this mode only on localhost; never expose it to the public internet.**
+Demo 模式才會建立並顯示 `viewer`、`planner`、`approver` 等已知測試帳密。**只能在本機展示使用，不得開放至公網。**
 
-## Key configuration
+## 重要設定
 
-| Environment variable | Purpose | Default / requirement |
+| 環境變數 | 用途 | 預設／要求 |
 |---|---|---|
-| `ERP_DEMO_MODE` | Seeds synthetic data and demo users | `false`; localhost only |
-| `ERP_ORGANIZATION_ID` | Binds a SQLite database to one organization | Demo uses `demo-org`; existing non-demo databases must set it and then provision memberships and entitlements |
-| `ERP_DB_PATH` | Custom SQLite path | `data/erp.db` |
-| `LLM_MODEL` | Primary LiteLLM model | `gemini/gemini-2.5-flash` |
-| `LLM_FALLBACK_MODELS` | Comma-separated fallback models | See `.env.example` |
-| `LLM_ANALYSIS_MODEL` | Optional model for classification/translation | Primary chain when unset |
-| `GEMINI_API_KEY` / `OPENAI_API_KEY` | Provider credentials | Depends on the selected model |
-| `GNEWS_API_KEY` | Supply-chain news source | Optional |
-| `ERP_SCHEDULER_ACTOR` | Service identity for scheduled risk refresh | Disabled when unset |
-| `LINE_CHANNEL_ACCESS_TOKEN` / `LINE_CHANNEL_SECRET` | LINE Bot | Optional |
+| `ERP_DEMO_MODE` | 建立合成資料與 Demo 帳號 | `false`；僅限本機 |
+| `ERP_ORGANIZATION_ID` | 綁定此 SQLite DB 所屬組織 | Demo 自動使用 `demo-org`；既有非 Demo DB 必須設定後再配置 membership 與 entitlement |
+| `ERP_DB_PATH` | 自訂 SQLite 路徑 | `data/erp.db` |
+| `LLM_MODEL` | LiteLLM 主模型 | `gemini/gemini-2.5-flash` |
+| `LLM_FALLBACK_MODELS` | 逗號分隔的備援模型 | 見 `.env.example` |
+| `LLM_ANALYSIS_MODEL` | 新聞歸類／翻譯等副任務模型 | 未設時沿用主模型鏈 |
+| `GEMINI_API_KEY` / `OPENAI_API_KEY` | 對應模型供應商金鑰 | 依模型選擇 |
+| `GNEWS_API_KEY` | 供應鏈新聞來源 | 選用 |
+| `ERP_SCHEDULER_ACTOR` | 24 小時新聞刷新服務身分 | 未設定時停用 |
+| `LINE_CHANNEL_ACCESS_TOKEN` / `LINE_CHANNEL_SECRET` | LINE Bot | 選用 |
 
-## Tests and verification
+## 測試與驗證
 
 ```bash
 pip install -r requirements-dev.txt
 python -m pytest -q
 ```
 
-v1.0 local release verification: **327 passed**. CI runs on every pull request.
+v1.0 本機 release verification：**327 passed**。CI 會在每個 PR 自動執行。
 
-Coverage includes:
+測試包含：
 
-- L1/L2/L3 navigation and negative server-side authorization tests
-- Self-approval, revoked access, and cross-organization denial
-- Payload, resource-version, source-line, and price tamper rejection
-- Concurrent approval, CAS, rollback, and receipt replay
-- A single full replacement effect per source procurement line
-- Demo seed integrity with no orphan items and stable approved source-line identity across replays
+- L1/L2/L3 導覽與伺服器端授權負向測試
+- 提案人自審、撤權後執行與跨組織拒絕
+- payload／resource version／來源明細／價格竄改拒絕
+- 併發核准、CAS、rollback 與 receipt 冪等重放
+- 同一來源採購明細只能產生一個完整替代 effect
+- Demo 種子資料不得產生孤兒採購品項，重播也不得改變已核准來源明細的識別碼
 
-## Repository layout
+## 專案結構
 
 ```text
-api/                         FastAPI backend (used by the new frontend)
-web/                         React frontend + nginx (Dockerfile, nginx.conf)
-backend/                     access control, Agents, Gateway, Proposal, ERP, database
-frontend/                    Streamlit pages and L1/L2/L3 interfaces
-Dockerfile                   backend image (shared by api and legacy)
-docker-compose.yml           web + api + legacy services
+api/                         FastAPI 後端（新版前端使用）
+web/                         React 前端 + nginx（Dockerfile、nginx.conf）
+backend/                     權限、Agent、Gateway、Proposal、ERP 與資料庫
+frontend/                    Streamlit 頁面與 L1/L2/L3 操作介面
+Dockerfile                   後端映像（api 與 legacy 共用）
+docker-compose.yml           web + api + legacy 三個服務
 line bot/                    FastAPI + LINE Messaging API
-scripts/                     demo seed and operations utilities
-tests/                       governance, authorization, transaction, and UI-contract tests
-docs/                        architecture diagrams, runbooks, and release notes
+scripts/                     Demo 種子與維運工具
+tests/                       治理、授權、交易、UI contract 測試
+docs/                        架構圖、runbook 與 Release notes
 ```
 
-## Known limitations
+## 已知限制
 
-- One SQLite database represents one organization; this is not shared-database row-level multi-tenancy.
-- Application audit data is tamper-evident, but a host or database administrator can still alter files directly.
-- SQLite atomicity does not automatically extend to an external ERP API; cross-system execution still needs outbox, worker, and reconciliation patterns.
-- Demo users and synthetic data must not exist in production. Production identity, membership, entitlement, and secret provisioning are deployment responsibilities.
-- Upgrading an older non-demo database without an organization boundary fails fast. Set `ERP_ORGANIZATION_ID`, then provision `user_organizations` and `organization_entitlements` before startup.
+- 一個 SQLite DB 只代表一個 organization；不是共享 DB 的 row-level multi-tenancy。
+- 應用層 audit 是 tamper-evident，但不能抵擋擁有主機／資料庫管理權限的人直接改檔。
+- SQLite 原子交易證據不能直接外推到外部 ERP API；跨系統執行仍需要 outbox／worker／對帳策略。
+- Demo 帳號與合成資料不應存在於正式部署；正式環境需另行配置身分、membership、entitlement 與秘密管理。
+- 從早期非 Demo 資料庫升級時，若尚未建立組織邊界，啟動會 fail fast；必須先設定 `ERP_ORGANIZATION_ID`，再配置 `user_organizations` 與 `organization_entitlements`。
 
-## Versions
+## 版本
 
 - [v1.0 Releases](https://github.com/falltwo/AI-Risk-Based-Inventory-ERP/releases)
 - [v0.1 Release](https://github.com/falltwo/AI-Risk-Based-Inventory-ERP/releases/tag/v0.1)
 - [v1.0 English release notes](docs/releases/v1.0.md)
 - [v0.1 English release notes](docs/releases/v0.1.md)
 
-Stack: Python 3.11 · Streamlit · SQLite · LiteLLM · FastAPI · LINE Messaging API · Plotly
+技術組成：Python 3.11 · Streamlit · SQLite · LiteLLM · FastAPI · LINE Messaging API · Plotly
 
-## License
+## 授權
 
-Released under the [MIT License](LICENSE).
+本專案採用 [MIT License](LICENSE)。
