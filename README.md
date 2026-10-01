@@ -1,7 +1,5 @@
 # AI-Risk-Based-Inventory-ERP
 
-[English](README.md) | [繁體中文](README.zh.md)
-
 [![Tests](https://github.com/ewiwi22255/docker-project-test/actions/workflows/tests.yml/badge.svg)](https://github.com/ewiwi22255/docker-project-test/actions/workflows/tests.yml)
 [![Docker](https://github.com/ewiwi22255/docker-project-test/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/ewiwi22255/docker-project-test/actions/workflows/docker-publish.yml)
 ![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)
