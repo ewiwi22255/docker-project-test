@@ -80,9 +80,19 @@ v0.1 欄位依公開 repo 的初始乾淨快照整理；先前內部開發歷史
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/ewiwi22255/docker-project-test?quickstart=1)
 
 1. 點上方按鈕（或在 repo 頁面按綠色 **Code** → **Codespaces** → **Create codespace on main**）。
-2. 等待雲端機器建立，並自動執行 `docker compose`（第一次約 3–5 分鐘，終端機會顯示進度）。
-3. 完成後瀏覽器會自動開啟網頁；沒有的話，到下方 **PORTS（連接埠）** 分頁，點 `8080` 旁的地球圖示。
+2. Codespace 開好後，在下方終端機執行：
+
+   ```bash
+   bash .devcontainer/start.sh
+   ```
+
+   第一次建置約 3–5 分鐘，看到「ERP 已啟動」就完成了。
+3. 到下方 **PORTS（連接埠）** 分頁，點 `8080` 旁的地球圖示開啟網頁。
 4. 用 `admin / admin` 登入。舊版介面在網址後面加 `/legacy/`。
+
+> [!NOTE]
+> Codespace 啟動時也會自動執行一次 `start.sh`；如果已經在跑，再執行一次也沒關係，不會重複建立。
+> 出現 `docker: command not found` 代表 Codespace 進入了復原模式：按 `Ctrl + Shift + P` → **Codespaces: Rebuild Container** 重建即可。
 
 > [!TIP]
 > Codespaces 個人帳號每月有免費額度。用完記得到 https://github.com/codespaces 停止或刪除，避免耗用時數。

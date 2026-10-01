@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Codespace 每次啟動時執行：等 Docker 就緒後建置並啟動所有服務。
 set -euo pipefail
+cd "$(dirname "$0")/.."
+
+test -f .env.docker || cp .env.docker.example .env.docker
 
 for _ in $(seq 60); do
   docker info >/dev/null 2>&1 && break
