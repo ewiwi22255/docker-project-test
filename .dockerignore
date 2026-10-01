@@ -1,0 +1,33 @@
+# 機密與本機設定：絕不進映像（改由 docker compose 的 env_file 在執行時帶入）
+.env
+.env.*
+.streamlit/secrets.toml
+**/.api_secret
+
+# 資料庫與執行期資料
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# 前端另外用 web/Dockerfile 建置
+web/
+
+# 開發用雜項
+.git
+.github
+.claude
+.venv
+venv/
+**/__pycache__
+**/*.pyc
+.pytest_cache
+.mypy_cache
+.ruff_cache
+tests/
+docs/
+*.log
+Dockerfile
+docker-compose.yml
+.dockerignore

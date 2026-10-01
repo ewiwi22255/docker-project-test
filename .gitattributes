@@ -1,0 +1,2 @@
+# Shell 腳本在 Linux 容器裡執行，必須是 LF 換行（Windows 的 CRLF 會讓 bash 出錯）
+*.sh text eol=lf

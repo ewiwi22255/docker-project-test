@@ -1,0 +1,86 @@
+# 在 GitHub 上用 Docker 跑整套系統做煙霧測試，通過後把映像推到 GitHub Container Registry（ghcr.io）。
+# pull request → 只測試；push 到 main → 測試 + 發布 :latest；推 v* 標籤（例如 v1.1.0）→ 測試 + 發布 :1.1.0、:1.1
+# 映像名稱：ghcr.io/<owner>/<repo>-backend、ghcr.io/<owner>/<repo>-web（全小寫）
+name: docker
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 建立設定檔
+        run: cp .env.docker.example .env.docker
+
+      - name: 建置並啟動所有服務（等到 healthy）
+        run: docker compose --env-file .env.docker up -d --build --wait --wait-timeout 300
+
+      - name: 檢查網頁、API、舊版介面
+        run: |
+          curl -fsS http://localhost/ -o /dev/null
+          curl -fsS http://localhost/api/health
+          curl -fsS http://localhost/legacy/_stcore/health
+
+      - name: 失敗時印出紀錄
+        if: failure()
+        run: docker compose logs --no-color
+
+      - name: 關閉
+        if: always()
+        run: docker compose down -v
+
+  publish:
+    needs: smoke-test
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: backend
+            context: .
+          - name: web
+            context: ./web
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 映像名稱（轉小寫）
+        id: image
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}-${{ matrix.name }}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.image.outputs.name }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,format=short
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }}

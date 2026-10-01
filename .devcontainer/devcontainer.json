@@ -1,0 +1,22 @@
+// GitHub Codespaces：在雲端機器上用 Docker 啟動整套 ERP（web + api + legacy）。
+// 建立 Codespace 後會自動執行 start.sh，完成時 8080 埠會自動轉發並開啟網頁。
+{
+  "name": "ERP (Docker)",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "hostRequirements": {
+    "cpus": 2,
+    "memory": "4gb"
+  },
+  "postCreateCommand": "test -f .env.docker || cp .env.docker.example .env.docker",
+  "postStartCommand": "bash .devcontainer/start.sh",
+  "forwardPorts": [8080],
+  "portsAttributes": {
+    "8080": {
+      "label": "ERP 網頁",
+      "onAutoForward": "openBrowser"
+    }
+  }
+}
