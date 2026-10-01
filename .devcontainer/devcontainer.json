@@ -2,7 +2,8 @@
 // 建立 Codespace 後會自動執行 start.sh，完成時 8080 埠會自動轉發並開啟網頁。
 {
   "name": "ERP (Docker)",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  // 固定 Ubuntu 22.04：base:ubuntu 會跟著最新版走，docker-in-docker 不一定支援（例如 resolute）
+  "image": "mcr.microsoft.com/devcontainers/base:jammy",
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
